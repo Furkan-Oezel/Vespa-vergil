@@ -4,6 +4,7 @@
 # But not these files...
 !*.c
 !main.go
+!gen.go
 
 # Additionally, do not ignore the .gitignore file itself
 !.gitignore
