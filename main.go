@@ -31,6 +31,10 @@ func main() {
 	}
 	defer lsmHook.Close()
 
+	log.Printf("<<<<--------------------------------------------------------->>>>")
+	log.Printf("	              YOU HAVE BEEN HACKED!!!")
+	log.Printf("<<<<--------------------------------------------------------->>>>")
+
 	// Wait for a signal to exit.
 	sig := make(chan os.Signal, 1)
 	signal.Notify(sig, os.Interrupt)
