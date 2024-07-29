@@ -39,31 +39,31 @@ Alternatively build for Raspberry Pi (arm64 architecture):
 CGO_ENABLED=0 GOARCH=arm64 go build -o vergil_arm
 ```
 
-Build docker image
+Build docker image:
 
 ```bash
 docker build -t vergil-docker .
 ```
 
-Look for any running docker containers with the same image
+Look for any running docker containers with the same image:
 
 ```bash
 docker ps -a
 ```
 
-Stop and remove docker containers if necessary
+Stop and remove docker containers if necessary:
 
 ```bash
 docker rm -f $(docker ps -aq)
 ```
 
-Run Vespa vergil in an interactive terminal
+Run Vespa vergil in an interactive terminal:
 
 ```bash
 docker run -it --privileged vergil-docker
 ```
 
-Run an alpine container to test Vespa vergil
+Run an alpine container to test Vespa vergil:
 
 ```bash
 docker run -it alpine
