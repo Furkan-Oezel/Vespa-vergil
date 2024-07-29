@@ -23,16 +23,25 @@ func main() {
 	defer objs.Close()
 
 	// Attach the eBPF program to a hook.
-	lsmHook, err := link.AttachLSM(link.LSMOptions{
+	chmodHook, err := link.AttachLSM(link.LSMOptions{
 		Program: objs.PathChmod,
 	})
 	if err != nil {
 		log.Fatalf("attaching LSM program: %v", err)
 	}
-	defer lsmHook.Close()
+	defer chmodHook.Close()
+
+	// Attach the eBPF program to a hook.
+	rmdirHook, err := link.AttachLSM(link.LSMOptions{
+		Program: objs.PathRmdir,
+	})
+	if err != nil {
+		log.Fatalf("attaching LSM program: %v", err)
+	}
+	defer rmdirHook.Close()
 
 	log.Printf("<<<<--------------------------------------------------------->>>>")
-	log.Printf("	              YOU HAVE BEEN HACKED!!!")
+	log.Printf("	              hi")
 	log.Printf("<<<<--------------------------------------------------------->>>>")
 
 	// Wait for a signal to exit.
