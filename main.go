@@ -40,6 +40,15 @@ func main() {
 	}
 	defer rmdirHook.Close()
 
+	// attach filepermission program to a hook
+	filepermissionHook, err := link.AttachLSM(link.LSMOptions{
+		Program: objs.FilePermission,
+	})
+	if err != nil {
+		log.Fatalf("attaching LSM program: %v", err)
+	}
+	defer filepermissionHook.Close()
+
 	log.Printf("<<<<--------------------------------------------------------->>>>")
 	log.Printf("	              hi")
 	log.Printf("<<<<--------------------------------------------------------->>>>")
