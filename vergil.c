@@ -35,9 +35,12 @@ int BPF_PROG(path_rmdir, const struct path *path, struct dentry *dentry) {
   return 0;
 }
 
+#define EXECUTE_REQUEST 0x1
+#define WRITE_REQUEST 0x2
+#define ID 123
+
 SEC("lsm/file_permission")
 int BPF_PROG(file_permission, struct file *file, int mask) {
-  // Buffer to store the file name
   char filename[256];
   const char *suffix = "confidential";
   int suffix_len = 12; // Length of "confidential"
@@ -62,6 +65,18 @@ int BPF_PROG(file_permission, struct file *file, int mask) {
       // Print a message if the file name ends with "confidential"
       bpf_printk("Access or manipulation of confidential file: %s\n", filename);
       bpf_printk("the value of mask: %d\n", mask);
+
+      umode_t mode = file->f_inode->i_mode;
+
+      gid_t gid = file->f_inode->i_gid.val;
+
+      if ((mask & WRITE_REQUEST) | (mask & EXECUTE_REQUEST)) {
+        if (gid == ID) {
+          bpf_printk("access denied for file: %s\n", filename);
+        }
+      } else {
+        return -EPERM;
+      }
     }
   }
 
