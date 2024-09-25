@@ -7,8 +7,6 @@
 #include <linux/errno.h>
 #include <string.h>
 
-#define PAGE_SIZE 4096
-
 SEC("lsm/path_chmod")
 int BPF_PROG(path_chmod, const struct path *path, umode_t mode) {
   char buf[32];

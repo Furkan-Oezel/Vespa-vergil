@@ -49,6 +49,15 @@ func main() {
 	}
 	defer filepermissionHook.Close()
 
+	// attach memory management program to a hook
+	trackmemoryHook, err := link.AttachLSM(link.LSMOptions{
+		Program: objs.TrackMemory,
+	})
+	if err != nil {
+		log.Fatalf("attaching LSM program: %v", err)
+	}
+	defer trackmemoryHook.Close()
+
 	log.Printf("<<<<--------------------------------------------------------->>>>")
 	log.Printf("	              hi")
 	log.Printf("<<<<--------------------------------------------------------->>>>")
