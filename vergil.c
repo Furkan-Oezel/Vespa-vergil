@@ -7,6 +7,8 @@
 #include <linux/errno.h>
 #include <string.h>
 
+#define PAGE_SIZE 4096
+
 SEC("lsm/path_chmod")
 int BPF_PROG(path_chmod, const struct path *path, umode_t mode) {
   char buf[32];
@@ -79,6 +81,15 @@ int BPF_PROG(file_permission, struct file *file, int mask) {
       }
     }
   }
+
+  return 0;
+}
+
+SEC("lsm/task_alloc")
+int BPF_PROG(track_memory, struct task_struct *task) {
+
+  // get process id
+  pid_t pid = task->pid;
 
   return 0;
 }
