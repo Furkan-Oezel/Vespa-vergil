@@ -16,8 +16,8 @@ func main() {
 	}
 
 	// Load the compiled eBPF ELF and load it into the kernel.
-	var objs firewallObjects
-	if err := loadFirewallObjects(&objs, nil); err != nil {
+	var objs docker_process_IDs_mapObjects
+	if err := loadDocker_process_IDs_mapObjects(&objs, nil); err != nil {
 		log.Fatal("Loading eBPF objects:", err)
 	}
 
