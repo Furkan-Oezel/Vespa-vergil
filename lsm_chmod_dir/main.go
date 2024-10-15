@@ -2,7 +2,7 @@
  * documentation: https://ebpf-go.dev/guides/getting-started/#compile-ebpf-c-and-generate-scaffolding-using-bpf2go
  */
 
-package lsm_chmod
+package main
 
 import (
 	"log"
@@ -38,17 +38,17 @@ func main() {
 	defer objs.Close()
 
 	/*
- 	 * The link.AttachLSM function attaches the eBPF program to the appropriate LSM hook,
- 	 * but it’s the eBPF program itself that determines which LSM hook it is attaching to,
- 	 * based on its definition (in this case lsm/path_chmod)
- 	 * The LSMOptions struct contains options for how the eBPF program should be attached,
- 	 * like which program to attach (the PathChmod Program in this case) and any other configuration options.
- 	 * chmodHook is a variable of type link.Link (from the github.com/cilium/ebpf/link package).
- 	 * it represents the connection between the eBPF program and the LSM hook
-	 * it manages the lifecycle of the link with methods such as Close()
- 	 * Close() ensures that the link between the eBPF program and the LSM hook (chmod syscall in this case)
- 	 * is properly cleaned up
-	 */
+		 	 * The link.AttachLSM function attaches the eBPF program to the appropriate LSM hook,
+		 	 * but it’s the eBPF program itself that determines which LSM hook it is attaching to,
+		 	 * based on its definition (in this case lsm/path_chmod)
+		 	 * The LSMOptions struct contains options for how the eBPF program should be attached,
+		 	 * like which program to attach (the PathChmod Program in this case) and any other configuration options.
+		 	 * chmodHook is a variable of type link.Link (from the github.com/cilium/ebpf/link package).
+		 	 * it represents the connection between the eBPF program and the LSM hook
+			 * it manages the lifecycle of the link with methods such as Close()
+		 	 * Close() ensures that the link between the eBPF program and the LSM hook (chmod syscall in this case)
+		 	 * is properly cleaned up
+	*/
 	chmodHook, err := link.AttachLSM(link.LSMOptions{
 		Program: objs.PathChmod,
 	})
