@@ -31,8 +31,8 @@ func main() {
 	 * the GO keyword defer ensures that the deferred call's arguments are evaluated immediately,
 	 * but the function call is not executed until the surrounding function returns
 	 */
-	objs := lsm_chmodObjects{}
-	if err := loadLsm_chmodObjects(&objs, nil); err != nil {
+	objs := lsm_rmdirObjects{}
+	if err := loadLsm_rmdirObjects(&objs, nil); err != nil {
 		log.Fatalf("failed to load into the kernel: %v", err)
 	}
 	defer objs.Close()
@@ -50,7 +50,7 @@ func main() {
 	 * is properly cleaned up
 	 */
 	chmodHook, err := link.AttachLSM(link.LSMOptions{
-		Program: objs.PathChmod,
+		Program: objs.PathRmdir,
 	})
 	if err != nil {
 		log.Fatalf("failed to attach to LSM Hook: %v", err)
@@ -58,7 +58,7 @@ func main() {
 	defer chmodHook.Close()
 
 	log.Printf("<<<<--------------------------------------------------------->>>>")
-	log.Printf("                 successfully loaded lsm_chmod")
+	log.Printf("                 succesfully loaded lsm_rmdir")
 	log.Printf("<<<<--------------------------------------------------------->>>>")
 
 	// Wait for a signal (e.g. control c) to exit.
