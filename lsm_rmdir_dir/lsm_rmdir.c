@@ -29,7 +29,7 @@ int BPF_PROG(path_rmdir, const struct path *path, struct dentry *dentry) {
   // read the directory name that is to be removed
   bpf_probe_read_str(buf, sizeof(buf), dentry->d_name.name);
   if (strncmp(buf, "furkan", 6) == 0) {
-    bpf_printk("rmdir attempted in %s\n", buf);
+    bpf_printk("rmdir attempted on the directory: '%s'\n", buf);
     return -EPERM;
   }
   return 0;
