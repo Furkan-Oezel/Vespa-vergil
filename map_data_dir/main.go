@@ -31,15 +31,15 @@ func main() {
 	 * the GO keyword defer ensures that the deferred call's arguments are evaluated immediately,
 	 * but the function call is not executed until the surrounding function returns
 	 */
-	objs := map_policyObjects{}
-	if err := loadMap_policyObjects(&objs, nil); err != nil {
+	objs := map_dataObjects{}
+	if err := loadMap_dataObjects(&objs, nil); err != nil {
 		log.Fatalf("failed to load into the kernel: %v", err)
 	}
 	defer objs.Close()
 
 	// pin map
 	mapPath := "/sys/fs/bpf/map_policy"
-	if err := objs.MapPolicy.Pin(mapPath); err != nil {
+	if err := objs.MapData.Pin(mapPath); err != nil {
 		log.Fatalf("Error pinning map: %s", err)
 	}
 
@@ -52,7 +52,7 @@ func main() {
 	defer objs.Close()
 
 	log.Printf("<<<<--------------------------------------------------------->>>>")
-	log.Printf("                 successfully loaded policy map")
+	log.Printf("                 successfully loaded data map")
 	log.Printf("<<<<--------------------------------------------------------->>>>")
 
 	// Wait for a signal (e.g. control c) to exit.
