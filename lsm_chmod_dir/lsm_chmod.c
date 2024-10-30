@@ -7,6 +7,7 @@
  * how to get this file: bpftool btf dump file /sys/kernel/btf/vmlinux format c
  * > vmlinux.h
  */
+#include "../include_dir/api_map.c"
 #include "../include_dir/vmlinux.h"
 // add bpf helper functions (e.g bpf_map_lookup_elem(), bpf_map_update_elem())
 #include <bpf/bpf_helpers.h>
@@ -31,7 +32,14 @@ SEC("lsm/path_chmod")
 int BPF_PROG(path_chmod, const struct path *path, umode_t mode) {
   char buf[32];
   bpf_probe_read_str(buf, sizeof(buf), path->dentry->d_parent->d_name.name);
-  if (strncmp(buf, "furkan", 6) == 0) {
+
+  u64 *dir_ptr = get_dir_in_which_chmod_is_forbidden();
+  if (!dir_ptr) {
+    return 0;
+  }
+
+  char *dir_char_ptr = (char *)dir_ptr;
+  if (strncmp(buf, dir_char_ptr, 32) == 0) {
     bpf_printk("chmod attempted in %s\n", buf);
     return -EPERM;
   }
