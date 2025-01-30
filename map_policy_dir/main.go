@@ -8,8 +8,9 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"path"
 
-	"github.com/cilium/ebpf/link"
+	"github.com/cilium/ebpf"
 	"github.com/cilium/ebpf/rlimit"
 )
 
