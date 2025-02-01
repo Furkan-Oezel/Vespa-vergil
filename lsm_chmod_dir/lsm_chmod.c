@@ -47,15 +47,29 @@ SEC("lsm/path_chmod")
  */
 int BPF_PROG(path_chmod, const struct path *path, umode_t mode) {
   char buf[32];
+  // read the directory in which chmod is performed
   bpf_probe_read_str(buf, sizeof(buf), path->dentry->d_parent->d_name.name);
 
-  u64 *dir_ptr = get_dir_in_which_chmod_is_forbidden();
-  if (!dir_ptr) {
-    return 0;
+  __u32 k = 2;
+  char new_value[64] = "banana";
+  // update the second entry of map_policy with the string banana
+  int ret = bpf_map_update_elem(&map_policy, &k, new_value, BPF_ANY);
+  if (ret == 0) {
+    bpf_printk("Successfully updated map entry with key %d\n", k);
+  } else {
+    bpf_printk("Failed to update map entry with key %d\n", k);
   }
 
-  char *dir_char_ptr = (char *)dir_ptr;
-  if (strncmp(buf, dir_char_ptr, 32) == 0) {
+  int key = 4;
+  // look up and print the forth entry of map_policy
+  char *value = bpf_map_lookup_elem(&map_policy, &key);
+  if (value)
+    bpf_printk("Value read from the map: '%s'\n", value);
+  else
+    bpf_printk("Failed to read value from the map\n");
+
+  // if the read directory == 'furkan', then return error
+  if (strncmp(buf, "furkan", 32) == 0) {
     bpf_printk("chmod attempted in %s\n", buf);
     return -EPERM;
   }
