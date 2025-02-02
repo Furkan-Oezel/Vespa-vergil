@@ -8,15 +8,29 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"path"
 
+	"github.com/cilium/ebpf"
 	"github.com/cilium/ebpf/link"
 	"github.com/cilium/ebpf/rlimit"
+)
+
+const (
+	mapKey    uint32 = 0
+	bpfFSPath        = "/sys/fs/bpf"
 )
 
 func main() {
 	// Remove resource limits for kernels <5.11.
 	if err := rlimit.RemoveMemlock(); err != nil {
 		log.Fatalf("failed to remove memory lock: %v", err)
+	}
+
+	// Name of the kernel function to trace.
+	kernel_function := "kernel_function"
+	pinPath := path.Join(bpfFSPath, kernel_function)
+	if err := os.MkdirAll(pinPath, os.ModePerm); err != nil {
+		log.Fatalf("failed to create bpf fs subpath: %+v", err)
 	}
 
 	/*
@@ -32,7 +46,11 @@ func main() {
 	 * but the function call is not executed until the surrounding function returns
 	 */
 	objs := lsm_chmodObjects{}
-	if err := loadLsm_chmodObjects(&objs, nil); err != nil {
+	if err := loadLsm_chmodObjects(&objs, &ebpf.CollectionOptions{
+		Maps: ebpf.MapOptions{
+			PinPath: pinPath,
+		},
+	}); err != nil {
 		log.Fatalf("failed to load into the kernel: %v", err)
 	}
 	defer objs.Close()
