@@ -73,7 +73,18 @@ docker run -it alpine
 
 The following commands are useful for inspecting and modifying eBPF maps that are pinned in the BPF filesystem. 
 
-### 1. Dumping an eBPF Map
+### 1. Printing bpf_printk() messages
+
+```bash
+sudo cat /sys/kernel/debug/tracing/trace_pipe
+```
+
+**Description:**  
+This command provides a real-time stream of kernel trace events from the ftrace subsystem. Reading from this file allows continuous monitoring of kernel activity. This file is available when debugfs is mounted and tracing is enabled.
+
+---
+
+### 2. Dumping an eBPF Map
 
 ```bash
 sudo bpftool map dump pinned /sys/fs/bpf/kernel_function/map_policy
@@ -84,7 +95,7 @@ This command dumps the contents of the eBPF map located at `/sys/fs/bpf/kernel_f
 
 ---
 
-### 2. Listing BPF Filesystem Contents
+### 3. Listing BPF Filesystem Contents
 
 ```bash
 sudo ls -lha /sys/fs/bpf
@@ -95,14 +106,14 @@ This command lists the contents of the `/sys/fs/bpf` directory. It allows to vie
 
 ---
 
-### 3. Updating an eBPF Map Entry
+### 4. Updating an eBPF Map Entry
 
 ```bash
-sudo bpftool map update pinned /sys/fs/bpf/sys_execve/map_policy key hex 04 00 00 00 value hex 61 70 70 6c 65 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+sudo bpftool map update pinned /sys/fs/bpf/kernel_function/map_policy key hex 04 00 00 00 value hex 61 70 70 6c 65 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
 ```
 
 **Description:**  
-This command updates a specific entry in the eBPF map located at `/sys/fs/bpf/sys_execve/map_policy`. It writes a new value (`"apple"`, encoded in hexadecimal) to the key (`04 00 00 00`).
+This command updates a specific entry in the eBPF map located at `/sys/fs/bpf/kernel_function/map_policy`. It writes a new value (`"apple"`, encoded in hexadecimal) to the key (`04 00 00 00`).
 
 ---
 
