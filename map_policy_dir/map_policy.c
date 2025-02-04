@@ -27,8 +27,9 @@ struct {
   __uint(type, BPF_MAP_TYPE_ARRAY);
   // declare pointer called 'key' that is of the type '__u32'
   __type(key, __u32);
-  // declare pointer called 'value' that is of the type '__u64'
-  __type(value, __u64);
+  // declare pointer called 'value' that is of the type 'char' (points to first
+  // element of a char array)
+  __type(value, char[64]);
   // declare pointer called 'max_entries' that points to a int array of the size
   // 5
   __uint(max_entries, 5);
