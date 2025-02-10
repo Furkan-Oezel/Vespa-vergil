@@ -80,3 +80,5 @@ int BPF_PROG(file_permission, struct file *file, int mask) {
 
   return 0;
 }
+
+char _license[] SEC("license") = "GPL";
