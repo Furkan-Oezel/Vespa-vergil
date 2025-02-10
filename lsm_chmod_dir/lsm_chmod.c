@@ -31,6 +31,11 @@ struct {
   __uint(pinning, LIBBPF_PIN_BY_NAME);
 } map_policy SEC(".maps");
 
+struct {
+  __uint(type, BPF_MAP_TYPE_RINGBUF);
+  __uint(max_entries, 4096);
+} map_data SEC(".maps");
+
 /*
  * available LSM hooks: https://www.kernel.org/doc/html/v5.2/security/LSM.html
  * how to get BPF_PROG function declaration for the path_chmod LSM hook:

@@ -16,8 +16,7 @@ import (
 )
 
 const (
-	mapKey    uint32 = 0
-	bpfFSPath        = "/sys/fs/bpf"
+	bpfFSPath = "/sys/fs/bpf"
 )
 
 func main() {
