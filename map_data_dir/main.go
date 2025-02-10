@@ -8,15 +8,28 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"path"
 
-	"github.com/cilium/ebpf/link"
+	"github.com/cilium/ebpf"
 	"github.com/cilium/ebpf/rlimit"
+)
+
+const (
+	bpf_fs_path = "/sys/fs/bpf"
 )
 
 func main() {
 	// Remove resource limits for kernels <5.11.
 	if err := rlimit.RemoveMemlock(); err != nil {
 		log.Fatalf("failed to remove memory lock: %v", err)
+	}
+
+	// Name of the kernel function to trace.
+	kernel_function := "kernel_function"
+
+	pinPath := path.Join(bpf_fs_path, kernel_function)
+	if err := os.MkdirAll(pinPath, os.ModePerm); err != nil {
+		log.Fatalf("failed to create bpf fs subpath: %+v", err)
 	}
 
 	/*
@@ -32,23 +45,17 @@ func main() {
 	 * but the function call is not executed until the surrounding function returns
 	 */
 	objs := map_dataObjects{}
-	if err := loadMap_dataObjects(&objs, nil); err != nil {
+	if err := loadMap_dataObjects(&objs, &ebpf.CollectionOptions{
+		Maps: ebpf.MapOptions{
+			// Pin the map to the BPF filesystem and configure the
+			// library to automatically re-write it in the BPF
+			// program so it can be re-used if it already exists or
+			// create it if not
+			PinPath: pinPath,
+		},
+	}); err != nil {
 		log.Fatalf("failed to load into the kernel: %v", err)
 	}
-	defer objs.Close()
-
-	// pin map
-	mapPath := "/sys/fs/bpf/map_policy"
-	if err := objs.MapData.Pin(mapPath); err != nil {
-		log.Fatalf("Error pinning map: %s", err)
-	}
-
-	// unpin map when the program stops running
-	defer func() {
-		if err := os.Remove(mapPath); err != nil {
-			log.Printf("Error unpinning map: %s", err)
-		}
-	}()
 	defer objs.Close()
 
 	log.Printf("<<<<--------------------------------------------------------->>>>")
