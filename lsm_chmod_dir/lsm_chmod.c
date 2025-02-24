@@ -8,8 +8,7 @@
  * > vmlinux.h
  */
 #include "../include_dir/vmlinux.h"
-// #include "../include_dir/api_map.c"
-//  add bpf helper functions (e.g bpf_map_lookup_elem(), bpf_map_update_elem())
+// add bpf helper functions (e.g bpf_map_lookup_elem(), bpf_map_update_elem())
 #include <bpf/bpf_helpers.h>
 #include <bpf/bpf_tracing.h>
 #include <linux/errno.h>
@@ -31,10 +30,18 @@ struct {
   __uint(pinning, LIBBPF_PIN_BY_NAME);
 } map_policy SEC(".maps");
 
+// data map
 struct {
   __uint(type, BPF_MAP_TYPE_RINGBUF);
   __uint(max_entries, 4096);
+  __uint(pinning, LIBBPF_PIN_BY_NAME);
 } map_data SEC(".maps");
+
+// declare struct for the ringbuffer 'map_data'
+struct event_t {
+  __u32 pid;
+  char filename[32];
+};
 
 /*
  * available LSM hooks: https://www.kernel.org/doc/html/v5.2/security/LSM.html
@@ -78,6 +85,25 @@ int BPF_PROG(path_chmod, const struct path *path, umode_t mode) {
     bpf_printk("chmod attempted in %s\n", buf);
     return -EPERM;
   }
+
+  struct event_t *event;
+
+  // reserve memory for ringbuffer with the size of the struct 'event_t'
+  event = bpf_ringbuf_reserve(&map_data, sizeof(struct event_t), 0);
+  if (!event) {
+    return 0; // error while trying to reserve -> no logging
+  }
+
+  // get process ID and store it into field 'pid' of the struct variable 'event'
+  event->pid = bpf_get_current_pid_tgid() >> 32;
+
+  // get pathname and store it into field 'filename' of the struct variable
+  // 'event'
+  bpf_probe_read_str(event->filename, sizeof(event->filename),
+                     path->dentry->d_parent->d_name.name);
+
+  // store the struct variable 'event' into the ringbuffer 'map_data'
+  bpf_ringbuf_submit(event, 0);
   return 0;
 }
 
